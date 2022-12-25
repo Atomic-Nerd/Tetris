@@ -16,7 +16,13 @@ GREEN = (0,192,0)
 YELLOW = (255,255,0)
 BOX_COLOURS = [None,RED,BLUE,GREEN,YELLOW]
 
+#Creating outer bounds
 grid = [[0 for i in range(10)] for i in range(20)]
+for i in range(20):
+    grid[i].insert(0,"X")
+    grid[i].append("X")
+
+grid.append(["X" for i in range(12)])
 
 SHAPES = [
     [
@@ -82,8 +88,8 @@ def draw():
 
     screen.blit(nextText, (500, 250))
 
-    for i in range(10):
-        for j in range(20):
+    for i in range(1,11):
+        for j in range(0,20):
             colour = GRAY
             x = 100 + i * GRID_SIZE
             y = 50 + j * GRID_SIZE
