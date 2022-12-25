@@ -5,6 +5,7 @@ pygame.init()
 
 screen = pygame.display.set_mode((750, 600))
 pygame.display.set_caption("Tetris")
+clock =  pygame.time.Clock()
 
 font = pygame.font.SysFont('consolas', 30)
 
@@ -124,10 +125,28 @@ def draw():
 
 user = player()
 
+def drawPaused():
+    s = pygame.Surface((750, 600))
+    s.set_alpha(128)
+    s.fill((255, 255, 255))
+    screen.blit(s, (0, 0))
+    pygame.display.update()
+
+paused = False
+
 while True:
 
-    draw()
+    clock.tick(10)
+
+    keys = pygame.key.get_pressed()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            paused = not paused
+            if paused:
+                drawPaused()
+
+    if not(paused):
+        draw()
