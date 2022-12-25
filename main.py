@@ -15,65 +15,65 @@ RED = (255,0,0)
 BLUE = (0,32,255)
 GREEN = (0,192,0)
 YELLOW = (255,255,0)
-BOX_COLOURS = [None,RED,BLUE,GREEN,YELLOW]
+AQUA = (0,255,255)
+ORANGE = (249,146,69)
+PURPLE = (230,230,250)
+BOX_COLOURS = [None,RED,BLUE,GREEN,YELLOW,AQUA,ORANGE,PURPLE]
 
 #Creating outer bounds
-grid = [[0 for i in range(10)] for i in range(20)]
+main_grid = [[0 for i in range(10)] for i in range(20)]
 for i in range(20):
-    grid[i].insert(0,"X")
-    grid[i].append("X")
+    main_grid[i].insert(0,"X")
+    main_grid[i].append("X")
 
-grid.append(["X" for i in range(12)])
+main_grid.append(["X" for i in range(12)])
+temp_grid = main_grid.copy()
 
 SHAPES = [
     [
-        [1,1,1],
-        [0,1,0],
+        [7,7,7],
+        [0,7,0],
     ],
     [
         [1,1,0],
         [0,1,1],
     ],
     [
-        [0,1,1],
-        [1,1,0],
+        [0,3,3],
+        [3,3,0],
     ],
     [
-        [0,0,1],
-        [1,1,1],
+        [0,0,6],
+        [6,6,6],
     ],
     [
-        [1,1,1],
-        [0,0,1],
+        [2,0,0],
+        [2,2,2],
     ],
     [
-        [1,1],
-        [1,1]
+        [4,4],
+        [4,4]
     ],
     [
-        [1,1,1,1]
+        [5,5,5,5]
     ]
 ]
 
 class player:
     def __init__(self):
-        self.grid_x = 0
-        self.grid_y = 0
+        self.main_grid_x = 0
+        self.main_grid_y = 0
 
         self.shape = SHAPES[random.randint(0,6)]
         self.next_shape = SHAPES[random.randint(0,6)]
-        self.shape_colour_code = random.randint(1,4)
-        self.next_shape_colour_code = random.randint(1,4)
 
         self.score = 0
         self.lines = 0
 
     def newShape(self):
         self.shape = self.next_shape
-        self.shape_colour_code = self.next_shape_colour_code
 
         self.next_shape = SHAPES[random.randint(0,6)]
-        self.next_shape_colour_code = random.randint(1,4)
 
 def draw():
 
@@ -98,12 +98,12 @@ def draw():
             y = 50 + j * GRID_SIZE
             w, h = GRID_SIZE, GRID_SIZE
             pygame.draw.rect(screen, colour, (x, y, w, h),1)
-            if grid[j][i] != 0:
+            if temp_grid[j][i] != 0:
                 x += 1
                 y += 1
                 w -= 2
                 h -= 2
-                colour = BOX_COLOURS[grid[j][i]]
+                colour = BOX_COLOURS[temp_grid[j][i]]
                 pygame.draw.rect(screen, colour, (x,y, w, h))
 
     for i in range(4):
@@ -117,7 +117,7 @@ def draw():
     for i in range(len(user.next_shape)):
         for j in range(len((user.next_shape)[i])):
             if user.next_shape[i][j] != 0:
-                colour = BOX_COLOURS[user.next_shape_colour_code]
+                colour = BOX_COLOURS[user.next_shape[i][j]]
                 x = 1+490+j*GRID_SIZE
                 y = 1+325+i*GRID_SIZE
                 w, h = GRID_SIZE-2, GRID_SIZE-2
@@ -127,6 +127,8 @@ def draw():
 
 user = player()
 
+def updateGrid():
+    temp
 def drawPaused():
     s = pygame.Surface((750, 600))
     s.set_alpha(128)
@@ -162,5 +164,6 @@ while True:
         if next_move <= current_time*multiplier:
             next_move = current_time*multiplier + 1000
             multiplier += 0.01
+
 
         draw()
