@@ -90,8 +90,12 @@ def draw():
             w, h = GRID_SIZE, GRID_SIZE
             pygame.draw.rect(screen, colour, (x, y, w, h),1)
             if grid[j][i] != 0:
+                x += 1
+                y += 1
+                w -= 2
+                h -= 2
                 colour = BOX_COLOURS[grid[j][i]]
-                pygame.draw.rect(screen, colour, (x+1,y+1, w-2, h-2))
+                pygame.draw.rect(screen, colour, (x,y, w, h))
 
     for i in range(4):
         for j in range(4):
