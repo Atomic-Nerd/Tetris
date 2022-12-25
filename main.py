@@ -15,12 +15,55 @@ BOX_COLOURS = [None,(255,0,0),(0,32,255),(0,192,0),(255,255,0)]
 
 grid = [[0 for i in range(10)] for i in range(20)]
 
+SHAPES = [
+    [
+        [1,1,1],
+        [0,1,0],
+    ],
+    [
+        [1,1,0],
+        [0,1,1],
+    ],
+    [
+        [0,1,1],
+        [1,1,0],
+    ],
+    [
+        [0,0,1],
+        [1,1,1],
+    ],
+    [
+        [1,1,1],
+        [0,0,1],
+    ],
+    [
+        [1,1],
+        [1,1]
+    ],
+    [
+        [1,1,1,1]
+    ]
+]
+
 class player:
     def __init__(self):
         self.grid_x = 0
         self.grid_y = 0
+
+        self.shape = SHAPES[random.randint(0,6)]
+        self.next_shape = SHAPES[random.randint(0,6)]
+        self.shape_colour_code = random.randint(1,4)
+        self.next_shape_colour_code = random.randint(1,4)
+
         self.score = 0
         self.lines = 0
+
+    def newShape(self):
+        self.shape = self.next_shape
+        self.shape_colour_code = self.next_shape_colour_code
+
+        self.next_shape = SHAPES[random.randint(0,6)]
+        self.next_shape_colour_code = random.randint(1,4)
 
 def draw():
 
@@ -46,6 +89,12 @@ def draw():
     for i in range(4):
         for j in range(4):
             pygame.draw.rect(screen, GRAY, (490+i*GRID_SIZE, 300+j*GRID_SIZE, GRID_SIZE, GRID_SIZE),1)
+
+    for i in range(len(user.next_shape)):
+        for j in range(len((user.next_shape)[i])):
+            if user.next_shape[i][j] != 0:
+                colour_code = user.next_shape_colour_code
+                pygame.draw.rect(screen, BOX_COLOURS[colour_code],(1+490+j*GRID_SIZE,1+325+i*GRID_SIZE,GRID_SIZE-2,GRID_SIZE-2))
 
     pygame.display.update()
 
