@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+import numpy as np
 
 pygame.init()
 
@@ -31,22 +32,27 @@ temp_grid = main_grid.copy()
 
 SHAPES = [
     [
+        [0,0,0],
         [7,7,7],
         [0,7,0],
     ],
     [
+        [0,0,0],
         [1,1,0],
         [0,1,1],
     ],
     [
+        [0,0,0],
         [0,3,3],
         [3,3,0],
     ],
     [
+        [0,0,0],
         [0,0,6],
         [6,6,6],
     ],
     [
+        [0,0,0],
         [2,0,0],
         [2,2,2],
     ],
@@ -55,14 +61,25 @@ SHAPES = [
         [4,4]
     ],
     [
-        [5,5,5,5]
+        [0,0,0,0],
+        [0,0,0,0],
+        [5,5,5,5],
+        [0,0,0,0]
     ]
 ]
 
+paused = False
+
+current_time = pygame.time.get_ticks()
+
+next_move = current_time + 1000 # 1s = 1000ms
+
+multiplier = 1.0
+
 class player:
     def __init__(self):
-        self.main_grid_x = 0
-        self.main_grid_y = 0
+        self.shape_x = 0
+        self.shape_y = -1
 
         self.shape = SHAPES[random.randint(0,6)]
         self.next_shape = SHAPES[random.randint(0,6)]
@@ -72,7 +89,8 @@ class player:
 
     def newShape(self):
         self.shape = self.next_shape
-
+        self.shape_x = 0
+        self.shape_y = 0
         self.next_shape = SHAPES[random.randint(0,6)]
 
 def draw():
@@ -119,7 +137,7 @@ def draw():
             if user.next_shape[i][j] != 0:
                 colour = BOX_COLOURS[user.next_shape[i][j]]
                 x = 1+490+j*GRID_SIZE
-                y = 1+325+i*GRID_SIZE
+                y = 1+300+i*GRID_SIZE
                 w, h = GRID_SIZE-2, GRID_SIZE-2
                 pygame.draw.rect(screen, colour,(x,y,w,h))
 
@@ -127,8 +145,46 @@ def draw():
 
 user = player()
 
+def returnPositions(shape,x,y):
+    positions = []
+    for tempX in range(len(shape)):
+        for tempY in range(len(shape)):
+            if shape[tempY][tempX] != 0:
+                positions.append([y+tempY,x+tempX])
+
+    return positions
+
+def checkRow():
+    pass
+
 def updateGrid():
-    temp
+    main_grid = temp_grid.copy()
+
+def moveUser():
+    global multiplier
+    temp_grid = main_grid.copy()
+
+    nextPositions = returnPositions(user.shape,user.shape_x,user.shape_y+1)
+
+    canMove = True
+    for coord in nextPositions:
+       x = coord[1]
+       y = coord[0]
+       if main_grid[y][x+1] != 0:
+           updateGrid()
+           user.newShape()
+           checkRow()
+           multiplier += 0.01
+           canMove = False
+
+    if canMove:
+        for i in range(len(user.shape)):
+            for j in range(len(user.shape)):
+                if user.shape[j][i] != 0:
+                    temp_grid[1+user.shape_y+j][user.shape_x+i+1] = user.shape[j][i]
+
+    user.shape_y += 1
+
 def drawPaused():
     s = pygame.Surface((750, 600))
     s.set_alpha(128)
@@ -136,13 +192,7 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
-paused = False
-
-current_time = pygame.time.get_ticks()
-
-next_move = current_time + 1000 # 1s = 1000ms
-multiplier = 1.0
-
+moveUser()
 while True:
 
     pygame.time.wait(10)
@@ -163,7 +213,6 @@ while True:
 
         if next_move <= current_time*multiplier:
             next_move = current_time*multiplier + 1000
-            multiplier += 0.01
-
+            moveUser()
 
         draw()
