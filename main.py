@@ -10,8 +10,11 @@ font = pygame.font.SysFont('consolas', 30)
 
 GRID_SIZE = 25
 GRAY = (128,128,128)
-BOX_COLOURS = [None,(255,0,0),(0,32,255),(0,192,0),(255,255,0)]
-# RED, BLUE, GREEN, YELLOW
+RED = (255,0,0)
+BLUE = (0,32,255)
+GREEN = (0,192,0)
+YELLOW = (255,255,0)
+BOX_COLOURS = [None,RED,BLUE,GREEN,YELLOW]
 
 grid = [[0 for i in range(10)] for i in range(20)]
 
@@ -81,20 +84,31 @@ def draw():
 
     for i in range(10):
         for j in range(20):
-            pygame.draw.rect(screen, GRAY, (100+i*GRID_SIZE, 50+j*GRID_SIZE, GRID_SIZE, GRID_SIZE),1)
+            colour = GRAY
+            x = 100 + i * GRID_SIZE
+            y = 50 + j * GRID_SIZE
+            w, h = GRID_SIZE, GRID_SIZE
+            pygame.draw.rect(screen, colour, (x, y, w, h),1)
             if grid[j][i] != 0:
-                colour_code = grid[j][i]
-                pygame.draw.rect(screen, BOX_COLOURS[colour_code], (1+100 + i * GRID_SIZE, 1+50 + j * GRID_SIZE, GRID_SIZE-2, GRID_SIZE-2))
+                colour = BOX_COLOURS[grid[j][i]]
+                pygame.draw.rect(screen, colour, (x+1,y+1, w-2, h-2))
 
     for i in range(4):
         for j in range(4):
-            pygame.draw.rect(screen, GRAY, (490+i*GRID_SIZE, 300+j*GRID_SIZE, GRID_SIZE, GRID_SIZE),1)
+            colour = GRAY
+            x = 490+i*GRID_SIZE
+            y = 300+j*GRID_SIZE
+            w, h = GRID_SIZE, GRID_SIZE
+            pygame.draw.rect(screen, colour, (x, y, w, h),1)
 
     for i in range(len(user.next_shape)):
         for j in range(len((user.next_shape)[i])):
             if user.next_shape[i][j] != 0:
-                colour_code = user.next_shape_colour_code
-                pygame.draw.rect(screen, BOX_COLOURS[colour_code],(1+490+j*GRID_SIZE,1+325+i*GRID_SIZE,GRID_SIZE-2,GRID_SIZE-2))
+                colour = BOX_COLOURS[user.next_shape_colour_code]
+                x = 1+490+j*GRID_SIZE
+                y = 1+325+i*GRID_SIZE
+                w, h = GRID_SIZE-2, GRID_SIZE-2
+                pygame.draw.rect(screen, colour,(x,y,w,h))
 
     pygame.display.update()
 
