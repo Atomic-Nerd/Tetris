@@ -28,7 +28,7 @@ for i in range(20):
     main_grid[i].append("X")
 
 main_grid.append(["X" for i in range(12)])
-temp_grid = main_grid.copy()
+temp_grid = [row[:] for row in main_grid]
 
 SHAPES = [
     [
@@ -78,8 +78,8 @@ multiplier = 1.0
 
 class player:
     def __init__(self):
-        self.shape_x = 0
-        self.shape_y = -1
+        self.shape_x = 3
+        self.shape_y = -2
 
         self.shape = SHAPES[random.randint(0,6)]
         self.next_shape = SHAPES[random.randint(0,6)]
@@ -89,8 +89,8 @@ class player:
 
     def newShape(self):
         self.shape = self.next_shape
-        self.shape_x = 0
-        self.shape_y = 0
+        self.shape_x = 3
+        self.shape_y = -2
         self.next_shape = SHAPES[random.randint(0,6)]
 
 def draw():
@@ -158,11 +158,12 @@ def checkRow():
     pass
 
 def updateGrid():
-    main_grid = temp_grid.copy()
+    global main_grid
+    main_grid = [row[:] for row in temp_grid]
 
 def moveUser():
-    global multiplier
-    temp_grid = main_grid.copy()
+    global multiplier, temp_grid, main_grid
+    temp_grid = [row[:] for row in main_grid]
 
     nextPositions = returnPositions(user.shape,user.shape_x,user.shape_y+1)
 
@@ -171,6 +172,7 @@ def moveUser():
        x = coord[1]
        y = coord[0]
        if main_grid[y][x+1] != 0:
+           print ("New shape")
            updateGrid()
            user.newShape()
            checkRow()
@@ -178,12 +180,12 @@ def moveUser():
            canMove = False
 
     if canMove:
+        print ("Moved user")
         for i in range(len(user.shape)):
             for j in range(len(user.shape)):
                 if user.shape[j][i] != 0:
                     temp_grid[1+user.shape_y+j][user.shape_x+i+1] = user.shape[j][i]
-
-    user.shape_y += 1
+        user.shape_y += 1
 
 def drawPaused():
     s = pygame.Surface((750, 600))
