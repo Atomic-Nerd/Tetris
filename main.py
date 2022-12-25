@@ -79,7 +79,7 @@ multiplier = 1.0
 class player:
     def __init__(self):
         self.shape_x = 3
-        self.shape_y = -2
+        self.shape_y = -3
 
         self.shape = SHAPES[random.randint(0,6)]
         self.next_shape = SHAPES[random.randint(0,6)]
@@ -90,7 +90,7 @@ class player:
     def newShape(self):
         self.shape = self.next_shape
         self.shape_x = 3
-        self.shape_y = -2
+        self.shape_y = -3
         self.next_shape = SHAPES[random.randint(0,6)]
 
 def draw():
@@ -159,33 +159,70 @@ def checkRow():
 
 def updateGrid():
     global main_grid
+
     main_grid = [row[:] for row in temp_grid]
 
-def moveUser():
-    global multiplier, temp_grid, main_grid
-    temp_grid = [row[:] for row in main_grid]
+def checkEnd():
+    if user.shape_y <= 0:
+        return True
+    return False
 
-    nextPositions = returnPositions(user.shape,user.shape_x,user.shape_y+1)
-
-    canMove = True
+def canMove(shape,x,y,moveX,moveY):
+    nextPositions = returnPositions(shape,x+moveX,y+moveY)
     for coord in nextPositions:
-       x = coord[1]
-       y = coord[0]
-       if main_grid[y][x+1] != 0:
-           print ("New shape")
-           updateGrid()
-           user.newShape()
-           checkRow()
-           multiplier += 0.01
-           canMove = False
+        x = coord[1]
+        y = coord[0]
+        if y>=0:
+            if main_grid[y][x+1] != 0:
+                return False
+    return True
 
-    if canMove:
-        print ("Moved user")
+def moveRight():
+    global temp_grid
+
+    if canMove(user.shape,user.shape_x,user.shape_y,1,0):
+        temp_grid = [row[:] for row in main_grid]
+        user.shape_x += 1
         for i in range(len(user.shape)):
             for j in range(len(user.shape)):
                 if user.shape[j][i] != 0:
-                    temp_grid[1+user.shape_y+j][user.shape_x+i+1] = user.shape[j][i]
+                    if 1+user.shape_y+j >= 0:
+                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[j][i]
+
+
+def moveLeft():
+    global temp_grid
+
+    if canMove(user.shape,user.shape_x,user.shape_y,-1,0):
+        temp_grid = [row[:] for row in main_grid]
+        user.shape_x -= 1
+        for i in range(len(user.shape)):
+            for j in range(len(user.shape)):
+                if user.shape[j][i] != 0:
+                    if 1+user.shape_y+j >= 0:
+                        temp_grid[user.shape_y+j][user.shape_x+i+1] = user.shape[j][i]
+
+def moveUser():
+    global multiplier, temp_grid, main_grid
+
+    if canMove(user.shape,user.shape_x,user.shape_y,0,1):
+        temp_grid = [row[:] for row in main_grid]
         user.shape_y += 1
+        for i in range(len(user.shape)):
+            for j in range(len(user.shape)):
+                if user.shape[j][i] != 0:
+                    if 1+user.shape_y+j >= 0:
+                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[j][i]
+    else:
+        if not (checkEnd()):
+            updateGrid()
+            user.newShape()
+            checkRow()
+            multiplier += 0.01
+        else:
+            print("end")
+            while True:
+                pass
 
 def drawPaused():
     s = pygame.Surface((750, 600))
@@ -194,10 +231,9 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
-moveUser()
 while True:
 
-    pygame.time.wait(10)
+    pygame.time.wait(75)
 
     keys = pygame.key.get_pressed()
 
@@ -213,8 +249,18 @@ while True:
 
         current_time = pygame.time.get_ticks()
 
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            moveUser()
+
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            moveRight()
+
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            moveLeft()
+
         if next_move <= current_time*multiplier:
             next_move = current_time*multiplier + 1000
             moveUser()
+
 
         draw()
