@@ -163,7 +163,7 @@ def updateGrid():
     main_grid = [row[:] for row in temp_grid]
 
 def checkEnd():
-    if user.shape_y <= 0:
+    if user.shape_y <= -1:
         return True
     return False
 
@@ -259,7 +259,7 @@ while True:
             moveLeft()
 
         if next_move <= current_time*multiplier:
-            next_move = current_time*multiplier + 1000
+            next_move = current_time*multiplier + 1000 # 1s
             moveUser()
 
 
