@@ -1,11 +1,11 @@
 import pygame
 import random
+import time
 
 pygame.init()
 
 screen = pygame.display.set_mode((750, 600))
 pygame.display.set_caption("Tetris")
-clock =  pygame.time.Clock()
 
 font = pygame.font.SysFont('consolas', 30)
 
@@ -81,9 +81,11 @@ def draw():
 
     scoreText = font.render(f"Score: {str(user.score)}", True, (255,255,0))
     linesText = font.render(f"Lines: {str(user.lines)}", True, (255,255,0))
+    multiplierText = font.render(f"Speed: {round(multiplier,2)}x", True, (255, 255, 0))
 
     screen.blit(scoreText, (500, 100))
     screen.blit(linesText, (500, 130))
+    screen.blit(multiplierText, (500,160))
 
     nextText = font.render("Next:", True, (255,255,0))
 
@@ -134,9 +136,14 @@ def drawPaused():
 
 paused = False
 
+current_time = pygame.time.get_ticks()
+
+next_move = current_time + 1000 # 1s = 1000ms
+multiplier = 1.0
+
 while True:
 
-    clock.tick(10)
+    pygame.time.wait(10)
 
     keys = pygame.key.get_pressed()
 
@@ -149,4 +156,11 @@ while True:
                 drawPaused()
 
     if not(paused):
+
+        current_time = pygame.time.get_ticks()
+
+        if next_move <= current_time*multiplier:
+            next_move = current_time*multiplier + 1000
+            multiplier += 0.01
+
         draw()
