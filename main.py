@@ -290,6 +290,7 @@ def draw():
                 w, h = GRID_SIZE-2, GRID_SIZE-2
                 pygame.draw.rect(screen, colour,(x,y,w,h))
 
+    pygame.draw.rect(screen, RED, (125, 50, 250, 500), 3)
     pygame.display.update()
 
 def returnPositions(shape,x,y):
