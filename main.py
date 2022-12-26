@@ -458,24 +458,19 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
-class Sound:
-    def __init__(self,file_name):
-        self.sound = pygame.mixer.Sound(f"Sounds/{file_name}.wav")
-        self.volume = 0.3
-
-    def changeVolume(self,difference):
-        self.volume += difference
-
 # ---- SOUND EDITTING ------
 
 LINE_CLEAR_WAV = pygame.mixer.Sound(f"Sounds/line_clear.wav")
 GAME_OVER_WAV = pygame.mixer.Sound(f"Sounds/game_over.wav")
+PAUSE_WAV = pygame.mixer.Sound(f"Sounds/pause.wav")
 
-music_volume = 0.2
-effect_volume = 0.3
+music_volume = 0.1
+effect_volume = 0.4
 
 pygame.mixer.music.set_volume(music_volume)
 pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV,effect_volume)
+pygame.mixer.Sound.set_volume(GAME_OVER_WAV,effect_volume)
+pygame.mixer.Sound.set_volume(PAUSE_WAV,0.2)
 
 pygame.mixer.music.play(-1, 0)
 
@@ -492,8 +487,10 @@ while True:
             paused = not paused
             if paused:
                 pygame.mixer.music.pause()
+                PAUSE_WAV.play()
                 drawPaused()
             else:
+                PAUSE_WAV.play()
                 pygame.mixer.music.unpause()
 
     if not(paused):
