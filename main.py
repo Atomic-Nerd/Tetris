@@ -191,15 +191,17 @@ SHAPES = [
 paused = False
 
 current_time = pygame.time.get_ticks()
-
 next_move = current_time + 1000 # 1s = 1000ms
+
+next_rotate_right = current_time + 150
+next_rotate_left = current_time + 150
 
 multiplier = 1.0
 
 class player:
     def __init__(self):
         self.shape_x = 3
-        self.shape_y = -3
+        self.shape_y = -2
 
         self.shape = SHAPES[random.randint(0,6)]
         self.next_shape = SHAPES[random.randint(0,6)]
@@ -211,7 +213,7 @@ class player:
     def newShape(self):
         self.shape = self.next_shape
         self.shape_x = 3
-        self.shape_y = -3
+        self.shape_y = -2
         self.shape_orientation = 0
         self.next_shape = SHAPES[random.randint(0,6)]
 
@@ -254,10 +256,11 @@ def draw():
             w, h = GRID_SIZE, GRID_SIZE
             pygame.draw.rect(screen, colour, (x, y, w, h),1)
 
-    for i in range(len(user.next_shape[user.shape_orientation])):
-        for j in range(len((user.next_shape[user.shape_orientation])[i])):
-            if user.next_shape[user.shape_orientation][i][j] != 0:
-                colour = BOX_COLOURS[user.next_shape[user.shape_orientation][i][j]]
+
+    for i in range(len(user.next_shape[0])):
+        for j in range(len((user.next_shape[0])[i])):
+            if user.next_shape[0][i][j] != 0:
+                colour = BOX_COLOURS[user.next_shape[0][i][j]]
                 x = 1+490+j*GRID_SIZE
                 y = 1+300+i*GRID_SIZE
                 w, h = GRID_SIZE-2, GRID_SIZE-2
@@ -442,11 +445,13 @@ while True:
         if keys[pygame.K_a]:
             moveLeft()
 
-        if keys[pygame.K_e]:
+        if keys[pygame.K_e] and next_rotate_right <= current_time:
             rotateClockwise()
+            next_rotate_right = current_time + 150 # 0.15s
 
-        if keys[pygame.K_q]:
+        if keys[pygame.K_q] and next_rotate_left<= current_time:
             rotateCounterClockwise()
+            next_rotate_left = current_time+ 150 # 0.15s
 
         if next_move <= current_time*multiplier:
             next_move = current_time*multiplier + 1000 # 1s
