@@ -326,8 +326,10 @@ def updateGrid():
     main_grid = [row[:] for row in temp_grid]
 
 def checkEnd():
-    if user.shape_y <= -1:
-        return True
+    coords = returnPositions(user.shape[user.shape_orientation],user.shape_x,user.shape_y)
+    for coord in coords:
+        if coord[0] < 0:
+            return True
     return False
 
 def canMove(shape,x,y,moveX,moveY):
@@ -436,7 +438,7 @@ def moveUser():
         for i in range(len(user.shape[user.shape_orientation])):
             for j in range(len(user.shape[user.shape_orientation])):
                 if user.shape[user.shape_orientation][j][i] != 0:
-                    if 1+user.shape_y+j >= 0:
+                    if user.shape_y+j >= 0:
                         temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[user.shape_orientation][j][i]
     else:
         if not (checkEnd()):
@@ -474,6 +476,7 @@ pygame.mixer.Sound.set_volume(PAUSE_WAV,0.2)
 
 pygame.mixer.music.play(-1, 0)
 
+moveUser()
 while True:
 
     pygame.time.wait(75)
