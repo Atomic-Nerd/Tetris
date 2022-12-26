@@ -309,19 +309,16 @@ def checkRow():
             temp_grid[0].insert(0, "X")
             temp_grid[0].append("X")
             completed_rows += 1
+            LINE_CLEAR_WAV.play()
         else:
             y -= 1
 
     main_grid = [row[:] for row in temp_grid]
+
     user.lines += completed_rows
-    if completed_rows == 1:
-        user.score += 40
-    elif completed_rows == 2:
-        user.score += 100
-    elif completed_rows == 3:
-        user.score += 300
-    elif completed_rows == 4:
-        user.score += 1200
+
+    score_add = [0,40,100,300,1200]
+    user.score += score_add[completed_rows]
 
 def updateGrid():
     global main_grid
@@ -449,6 +446,8 @@ def moveUser():
             multiplier += 0.01
         else:
             print("end")
+            pygame.mixer.music.stop()
+            GAME_OVER_WAV.play()
             while True:
                 pass
 
@@ -469,14 +468,16 @@ class Sound:
 
 # ---- SOUND EDITTING ------
 
+LINE_CLEAR_WAV = pygame.mixer.Sound(f"Sounds/line_clear.wav")
+GAME_OVER_WAV = pygame.mixer.Sound(f"Sounds/game_over.wav")
+
 music_volume = 0.2
+effect_volume = 0.3
 
 pygame.mixer.music.set_volume(music_volume)
-
-effects_volume = 0.5
+pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV,effect_volume)
 
 pygame.mixer.music.play(-1, 0)
-
 
 while True:
 
