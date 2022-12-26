@@ -30,15 +30,6 @@ ORANGE = (249,146,69)
 PURPLE = (230,230,250)
 BOX_COLOURS = [None,RED,BLUE,GREEN,YELLOW,AQUA,ORANGE,PURPLE]
 
-#Creating outer bounds
-main_grid = [[0 for i in range(10)] for i in range(20)]
-for i in range(20):
-    main_grid[i].insert(0,"X")
-    main_grid[i].append("X")
-
-main_grid.append(["X" for i in range(12)])
-temp_grid = [row[:] for row in main_grid]
-
 SHAPES = [
     [
         [
@@ -445,7 +436,7 @@ def rotateClockwise():
                         temp_grid[user.shape_y + j][user.shape_x + i + 1] = shape[j][i]
 
 def moveUser():
-    global multiplier, temp_grid, main_grid
+    global multiplier, temp_grid, main_grid, play
 
     if canMove(user.shape[user.shape_orientation],user.shape_x,user.shape_y,0,1):
         temp_grid = [row[:] for row in main_grid]
@@ -462,11 +453,10 @@ def moveUser():
             checkRow()
             multiplier += 0.01
         else:
-            print("end")
+            draw()
             pygame.mixer.music.stop()
             GAME_OVER_WAV.play()
-            while True:
-                pass
+            play = False
 
 def drawPaused():
     s = pygame.Surface((750, 600))
@@ -475,51 +465,69 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
-user = player()
-moveUser()
-while True:
+menu = True
 
-    pygame.time.wait(75)
+while menu:
+    #Creating outer bounds
+    main_grid = [[0 for i in range(10)] for i in range(20)]
+    for i in range(20):
+        main_grid[i].insert(0,"X")
+        main_grid[i].append("X")
 
-    keys = pygame.key.get_pressed()
+    main_grid.append(["X" for i in range(12)])
+    temp_grid = [row[:] for row in main_grid]
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            exit()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            paused = not paused
-            if paused:
-                pygame.mixer.music.pause()
-                PAUSE_WAV.play()
-                drawPaused()
-            else:
-                PAUSE_WAV.play()
-                pygame.mixer.music.unpause()
+    user = player()
+    moveUser()
+    play = True
 
-    if not(paused):
+    while play:
+        pygame.time.wait(75)
 
-        current_time = pygame.time.get_ticks()
+        keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_s]:
-            moveUser()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                paused = not paused
+                if paused:
+                    pygame.mixer.music.pause()
+                    PAUSE_WAV.play()
+                    drawPaused()
+                else:
+                    PAUSE_WAV.play()
+                    pygame.mixer.music.unpause()
 
-        if keys[pygame.K_d]:
-            moveRight()
+        if not(paused):
 
-        if keys[pygame.K_a]:
-            moveLeft()
+            current_time = pygame.time.get_ticks()
 
-        if keys[pygame.K_e] and next_rotate_right <= current_time:
-            rotateClockwise()
-            next_rotate_right = current_time + 150 # 0.15s
+            if keys[pygame.K_s]:
+                moveUser()
 
-        if keys[pygame.K_q] and next_rotate_left<= current_time:
-            rotateCounterClockwise()
-            next_rotate_left = current_time+ 150 # 0.15s
+            if keys[pygame.K_d]:
+                moveRight()
 
-        if next_move <= current_time*multiplier:
-            next_move = current_time*multiplier + 1000 # 1s
-            moveUser()
+            if keys[pygame.K_a]:
+                moveLeft()
 
+            if keys[pygame.K_e] and next_rotate_right <= current_time:
+                rotateClockwise()
+                next_rotate_right = current_time + 150 # 0.15s
 
-        draw()
+            if keys[pygame.K_q] and next_rotate_left<= current_time:
+                rotateCounterClockwise()
+                next_rotate_left = current_time+ 150 # 0.15s
+
+            if next_move <= current_time*multiplier:
+                next_move = current_time*multiplier + 1000 # 1s
+                moveUser()
+
+            draw()
+
+    print ("Game Ending...")
+    for i in range(0,4):
+        print (f"Resetting in {3-i} seconds...")
+        pygame.time.wait(1000)
+    print ("Game resetting...")
