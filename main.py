@@ -11,6 +11,7 @@ pygame.display.set_caption("Tetris")
 font = pygame.font.SysFont('consolas', 30)
 
 GRID_SIZE = 25
+
 GRAY = (128,128,128)
 RED = (255,0,0)
 BLUE = (0,32,255)
@@ -32,39 +33,158 @@ temp_grid = [row[:] for row in main_grid]
 
 SHAPES = [
     [
-        [0,0,0],
-        [7,7,7],
-        [0,7,0],
+        [
+            [0,0,0],
+            [7,7,7],
+            [0,7,0]
+        ],
+        [
+            [0,7,0],
+            [7,7,0],
+            [0,7,0]
+        ],
+        [
+            [0,7,0],
+            [7,7,7],
+            [0,0,0]
+        ],
+        [
+            [0,7,0],
+            [0,7,7],
+            [0,7,0]
+        ]
     ],
     [
-        [0,0,0],
-        [1,1,0],
-        [0,1,1],
+        [
+            [0,0,0],
+            [1,1,0],
+            [0,1,1],
+        ],
+        [
+            [0,1,0],
+            [1,1,0],
+            [1,0,0],
+        ],
+        [
+            [1,1,0],
+            [0,1,1],
+            [0,0,0],
+        ],
+        [
+            [0,0,1],
+            [0,1,1],
+            [0,1,0],
+        ]
     ],
     [
-        [0,0,0],
-        [0,3,3],
-        [3,3,0],
+        [
+            [0,0,0],
+            [0,3,3],
+            [3,3,0],
+        ],
+        [
+            [3,0,0],
+            [3,3,0],
+            [0,3,0],
+        ],
+        [
+            [0,3,3],
+            [3,3,0],
+            [0,0,0],
+        ],
+        [
+            [0,3,0],
+            [0,3,3],
+            [0,0,3],
+        ]
     ],
     [
-        [0,0,0],
-        [0,0,6],
-        [6,6,6],
+        [
+            [0,0,0],
+            [0,0,6],
+            [6,6,6],
+        ],
+        [
+            [6,0,0],
+            [6,0,0],
+            [6,6,0],
+        ],
+        [
+            [6,6,6],
+            [6,0,0],
+            [0,0,0],
+        ],
+        [
+            [0,6,6],
+            [0,0,6],
+            [0,0,6],
+        ]
     ],
     [
-        [0,0,0],
-        [2,0,0],
-        [2,2,2],
+        [
+            [0,0,0],
+            [2,0,0],
+            [2,2,2],
+        ],
+        [
+            [2,2,0],
+            [2,0,0],
+            [2,0,0],
+        ],
+        [
+            [2,2,2],
+            [0,0,2],
+            [0,0,0],
+        ],
+        [
+            [0,0,2],
+            [0,0,2],
+            [0,2,2],
+        ]
     ],
     [
-        [4,4],
-        [4,4]
+        [
+            [4,4],
+            [4,4]
+        ],
+        [
+            [4,4],
+            [4,4]
+        ],
+        [
+            [4,4],
+            [4,4]
+        ],
+        [
+            [4,4],
+            [4,4]
+        ]
     ],
     [
-        [0,0,0,0],
-        [0,0,0,0],
-        [5,5,5,5],
-        [0,0,0,0]
+        [
+            [0,0,0,0],
+            [0,0,0,0],
+            [5,5,5,5],
+            [0,0,0,0]
+        ],
+        [
+            [0,5,0,0],
+            [0,5,0,0],
+            [0,5,0,0],
+            [0,5,0,0]
+        ],
+        [
+            [0,0,0,0],
+            [5,5,5,5],
+            [0,0,0,0],
+            [0,0,0,0]
+        ],
+        [
+            [0,0,5,0],
+            [0,0,5,0],
+            [0,0,5,0],
+            [0,0,5,0]
+        ]
     ]
 ]
 
@@ -83,6 +203,7 @@ class player:
 
         self.shape = SHAPES[random.randint(0,6)]
         self.next_shape = SHAPES[random.randint(0,6)]
+        self.shape_orientation = 0
 
         self.score = 0
         self.lines = 0
@@ -91,6 +212,7 @@ class player:
         self.shape = self.next_shape
         self.shape_x = 3
         self.shape_y = -3
+        self.shape_orientation = 0
         self.next_shape = SHAPES[random.randint(0,6)]
 
 def draw():
@@ -132,10 +254,10 @@ def draw():
             w, h = GRID_SIZE, GRID_SIZE
             pygame.draw.rect(screen, colour, (x, y, w, h),1)
 
-    for i in range(len(user.next_shape)):
-        for j in range(len((user.next_shape)[i])):
-            if user.next_shape[i][j] != 0:
-                colour = BOX_COLOURS[user.next_shape[i][j]]
+    for i in range(len(user.next_shape[user.shape_orientation])):
+        for j in range(len((user.next_shape[user.shape_orientation])[i])):
+            if user.next_shape[user.shape_orientation][i][j] != 0:
+                colour = BOX_COLOURS[user.next_shape[user.shape_orientation][i][j]]
                 x = 1+490+j*GRID_SIZE
                 y = 1+300+i*GRID_SIZE
                 w, h = GRID_SIZE-2, GRID_SIZE-2
@@ -180,39 +302,101 @@ def canMove(shape,x,y,moveX,moveY):
 def moveRight():
     global temp_grid
 
-    if canMove(user.shape,user.shape_x,user.shape_y,1,0):
+    shape = user.shape[user.shape_orientation]
+    if canMove(shape,user.shape_x,user.shape_y,1,0):
         temp_grid = [row[:] for row in main_grid]
         user.shape_x += 1
-        for i in range(len(user.shape)):
-            for j in range(len(user.shape)):
-                if user.shape[j][i] != 0:
+        for i in range(len(shape)):
+            for j in range(len(shape)):
+                if shape[j][i] != 0:
                     if 1+user.shape_y+j >= 0:
-                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[j][i]
+                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = shape[j][i]
 
 
 def moveLeft():
     global temp_grid
 
-    if canMove(user.shape,user.shape_x,user.shape_y,-1,0):
+    shape = user.shape[user.shape_orientation]
+    if canMove(shape,user.shape_x,user.shape_y,-1,0):
         temp_grid = [row[:] for row in main_grid]
         user.shape_x -= 1
-        for i in range(len(user.shape)):
-            for j in range(len(user.shape)):
-                if user.shape[j][i] != 0:
+        for i in range(len(shape)):
+            for j in range(len(shape)):
+                if shape[j][i] != 0:
                     if 1+user.shape_y+j >= 0:
-                        temp_grid[user.shape_y+j][user.shape_x+i+1] = user.shape[j][i]
+                        temp_grid[user.shape_y+j][user.shape_x+i+1] = shape[j][i]
+
+def nextOrientation(orientation_difference):
+    if orientation_difference == -1:
+        if user.shape_orientation == 0:
+            return 3
+        else:
+            return user.shape_orientation-1
+    else:
+        if user.shape_orientation == 3:
+            return 0
+        else:
+            return user.shape_orientation+1
+
+def canRotate(shape,x,y,orientation_difference):
+
+    nextShape = user.shape[nextOrientation(orientation_difference)]
+
+    nextPositions = returnPositions(nextShape,x,y)
+
+    for coord in nextPositions:
+        x = coord[1]
+        y = coord[0]
+        if y >= 0:
+            if main_grid[y][x + 1] != 0:
+                return False
+    return True
+
+def rotateCounterClockwise():
+    global temp_grid
+
+    shape = user.shape[user.shape_orientation]
+    if canRotate(shape,user.shape_x,user.shape_y,-1):
+
+        temp_grid = [row[:] for row in main_grid]
+
+        user.shape_orientation = nextOrientation(-1)
+        shape = user.shape[user.shape_orientation]
+
+        for i in range(len(shape)):
+            for j in range(len(shape)):
+                if shape[j][i] != 0:
+                    if 1+user.shape_y+j >= 0:
+                        temp_grid[user.shape_y+j][user.shape_x+i+1] = shape[j][i]
+
+def rotateClockwise():
+    global temp_grid
+
+    shape = user.shape[user.shape_orientation]
+    if canRotate(shape, user.shape_x, user.shape_y, 1):
+
+        temp_grid = [row[:] for row in main_grid]
+
+        user.shape_orientation = nextOrientation(1)
+        shape = user.shape[user.shape_orientation]
+
+        for i in range(len(shape)):
+            for j in range(len(shape)):
+                if shape[j][i] != 0:
+                    if 1 + user.shape_y + j >= 0:
+                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = shape[j][i]
 
 def moveUser():
     global multiplier, temp_grid, main_grid
 
-    if canMove(user.shape,user.shape_x,user.shape_y,0,1):
+    if canMove(user.shape[user.shape_orientation],user.shape_x,user.shape_y,0,1):
         temp_grid = [row[:] for row in main_grid]
         user.shape_y += 1
-        for i in range(len(user.shape)):
-            for j in range(len(user.shape)):
-                if user.shape[j][i] != 0:
+        for i in range(len(user.shape[user.shape_orientation])):
+            for j in range(len(user.shape[user.shape_orientation])):
+                if user.shape[user.shape_orientation][j][i] != 0:
                     if 1+user.shape_y+j >= 0:
-                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[j][i]
+                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[user.shape_orientation][j][i]
     else:
         if not (checkEnd()):
             updateGrid()
@@ -249,14 +433,20 @@ while True:
 
         current_time = pygame.time.get_ticks()
 
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        if keys[pygame.K_s]:
             moveUser()
 
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        if keys[pygame.K_d]:
             moveRight()
 
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if keys[pygame.K_a]:
             moveLeft()
+
+        if keys[pygame.K_e]:
+            rotateClockwise()
+
+        if keys[pygame.K_q]:
+            rotateCounterClockwise()
 
         if next_move <= current_time*multiplier:
             next_move = current_time*multiplier + 1000 # 1s
