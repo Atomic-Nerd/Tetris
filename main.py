@@ -306,6 +306,14 @@ def checkRow():
 
     main_grid = [row[:] for row in temp_grid]
     user.lines += completed_rows
+    if completed_rows == 1:
+        user.score += 40
+    elif completed_rows == 2:
+        user.score += 100
+    elif completed_rows == 3:
+        user.score += 300
+    elif completed_rows == 4:
+        user.score += 1200
 
 def updateGrid():
     global main_grid
