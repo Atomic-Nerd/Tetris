@@ -2,7 +2,7 @@ import pygame
 import random
 from pygame import mixer
 
-pygame.mixer.pre_init(44100, -16, 2, 512)
+pygame.mixer.pre_init(44100, 16, 2, 4096)
 
 pygame.init()
 mixer.init()
@@ -12,10 +12,6 @@ screen = pygame.display.set_mode((750, 600))
 pygame.display.set_caption("Tetris")
 
 font = pygame.font.SysFont('consolas', 30)
-
-# ---- SOUND EFFECTS -----
-
-#BACKGROUND_MUSIC_WAV = pygame.mixer.Sound("Sounds/background_music.wav")
 
 #--------- MUSIC ----------
 
@@ -463,6 +459,25 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
+class Sound:
+    def __init__(self,file_name):
+        self.sound = pygame.mixer.Sound(f"Sounds/{file_name}.wav")
+        self.volume = 0.3
+
+    def changeVolume(self,difference):
+        self.volume += difference
+
+# ---- SOUND EDITTING ------
+
+music_volume = 0.2
+
+pygame.mixer.music.set_volume(music_volume)
+
+effects_volume = 0.5
+
+pygame.mixer.music.play(-1, 0)
+
+
 while True:
 
     pygame.time.wait(75)
@@ -475,7 +490,10 @@ while True:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             paused = not paused
             if paused:
+                pygame.mixer.music.pause()
                 drawPaused()
+            else:
+                pygame.mixer.music.unpause()
 
     if not(paused):
 
