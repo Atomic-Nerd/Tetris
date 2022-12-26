@@ -280,7 +280,32 @@ def returnPositions(shape,x,y):
     return positions
 
 def checkRow():
-    pass
+    global main_grid
+
+    temp_grid = [row[:] for row in main_grid]
+    completed_rows = 0
+    y = 19
+    while y!=-1:
+        isCompleted = True
+        if temp_grid[y] == ["X",0,0,0,0,0,0,0,0,0,0,"X"]:
+            break
+        for element in temp_grid[y]:
+            if element == 0:
+                isCompleted = False
+                break
+        if isCompleted:
+            for i in range(0,y):
+                row_index = y-i
+                temp_grid[row_index] = temp_grid[row_index-1]
+            temp_grid[0] = [0 for i in range(10)]
+            temp_grid[0].insert(0, "X")
+            temp_grid[0].append("X")
+            completed_rows += 1
+        else:
+            y -= 1
+
+    main_grid = [row[:] for row in temp_grid]
+    user.lines += completed_rows
 
 def updateGrid():
     global main_grid
