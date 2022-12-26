@@ -1,15 +1,27 @@
 import pygame
 import random
-import time
-import numpy as np
+from pygame import mixer
+
+pygame.mixer.pre_init(44100, -16, 2, 512)
 
 pygame.init()
+mixer.init()
+
 
 screen = pygame.display.set_mode((750, 600))
 pygame.display.set_caption("Tetris")
 
 font = pygame.font.SysFont('consolas', 30)
 
+# ---- SOUND EFFECTS -----
+
+#BACKGROUND_MUSIC_WAV = pygame.mixer.Sound("Sounds/background_music.wav")
+
+#--------- MUSIC ----------
+
+pygame.mixer.music.load("Sounds/background_music.wav")
+
+# -----------------
 GRID_SIZE = 25
 
 GRAY = (128,128,128)
@@ -435,8 +447,8 @@ def moveUser():
                         temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[user.shape_orientation][j][i]
     else:
         if not (checkEnd()):
-            updateGrid()
             user.newShape()
+            updateGrid()
             checkRow()
             multiplier += 0.01
         else:
