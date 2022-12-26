@@ -206,6 +206,22 @@ next_rotate_left = current_time + 150
 
 multiplier = 1.0
 
+# ---- SOUND EDITTING ------
+
+LINE_CLEAR_WAV = pygame.mixer.Sound(f"Sounds/line_clear.wav")
+GAME_OVER_WAV = pygame.mixer.Sound(f"Sounds/game_over.wav")
+PAUSE_WAV = pygame.mixer.Sound(f"Sounds/pause.wav")
+
+music_volume = 0.1
+effect_volume = 0.4
+
+pygame.mixer.music.set_volume(music_volume)
+pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV,effect_volume)
+pygame.mixer.Sound.set_volume(GAME_OVER_WAV,effect_volume)
+pygame.mixer.Sound.set_volume(PAUSE_WAV,0.2)
+
+pygame.mixer.music.play(-1, 0)
+
 class player:
     def __init__(self):
         self.shape_x = 3
@@ -275,8 +291,6 @@ def draw():
                 pygame.draw.rect(screen, colour,(x,y,w,h))
 
     pygame.display.update()
-
-user = player()
 
 def returnPositions(shape,x,y):
     positions = []
@@ -460,22 +474,7 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
-# ---- SOUND EDITTING ------
-
-LINE_CLEAR_WAV = pygame.mixer.Sound(f"Sounds/line_clear.wav")
-GAME_OVER_WAV = pygame.mixer.Sound(f"Sounds/game_over.wav")
-PAUSE_WAV = pygame.mixer.Sound(f"Sounds/pause.wav")
-
-music_volume = 0.1
-effect_volume = 0.4
-
-pygame.mixer.music.set_volume(music_volume)
-pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV,effect_volume)
-pygame.mixer.Sound.set_volume(GAME_OVER_WAV,effect_volume)
-pygame.mixer.Sound.set_volume(PAUSE_WAV,0.2)
-
-pygame.mixer.music.play(-1, 0)
-
+user = player()
 moveUser()
 while True:
 
