@@ -7,7 +7,6 @@ pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 mixer.init()
 
-
 screen = pygame.display.set_mode((750, 600))
 pygame.display.set_caption("Tetris")
 
@@ -211,16 +210,25 @@ pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV,effect_volume)
 pygame.mixer.Sound.set_volume(GAME_OVER_WAV,effect_volume)
 pygame.mixer.Sound.set_volume(PAUSE_WAV,0.2)
 
-pygame.mixer.music.play(-1, 0)
+def determine_start_Y(shape):
+    shape_index = SHAPES.index(shape)
+
+    if shape_index < 3:
+        return -2
+    elif shape_index < 6:
+        return -1
+    else:
+        return -2
 
 class player:
     def __init__(self):
         self.shape_x = 3
-        self.shape_y = -2
 
         self.shape = SHAPES[random.randint(0,6)]
         self.next_shape = SHAPES[random.randint(0,6)]
         self.shape_orientation = 0
+
+        self.shape_y = determine_start_Y(self.shape)
 
         self.score = 0
         self.lines = 0
@@ -228,7 +236,7 @@ class player:
     def newShape(self):
         self.shape = self.next_shape
         self.shape_x = 3
-        self.shape_y = -2
+        self.shape_y = determine_start_Y(self.shape)
         self.shape_orientation = 0
         self.next_shape = SHAPES[random.randint(0,6)]
 
@@ -326,15 +334,10 @@ def checkRow():
     score_add = [0,40,100,300,1200]
     user.score += score_add[completed_rows]
 
-def updateGrid():
-    global main_grid
-
-    main_grid = [row[:] for row in temp_grid]
-
 def checkEnd():
     coords = returnPositions(user.shape[user.shape_orientation],user.shape_x,user.shape_y)
     for coord in coords:
-        if coord[0] < 0:
+        if coord[0] < 1:
             return True
     return False
 
@@ -449,14 +452,24 @@ def moveUser():
     else:
         if not (checkEnd()):
             user.newShape()
-            updateGrid()
+            main_grid = [row[:] for row in temp_grid]
             checkRow()
             multiplier += 0.01
+            drawFirst()
         else:
-            draw()
             pygame.mixer.music.stop()
             GAME_OVER_WAV.play()
             play = False
+
+def drawFirst():
+    global temp_grid
+
+    temp_grid = [row[:] for row in main_grid]
+    for i in range(len(user.shape[user.shape_orientation])):
+        for j in range(len(user.shape[user.shape_orientation])):
+            if user.shape[user.shape_orientation][j][i] != 0:
+                if user.shape_y + j >= 0:
+                    temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[user.shape_orientation][j][i]
 
 def drawPaused():
     s = pygame.Surface((750, 600))
@@ -468,6 +481,9 @@ def drawPaused():
 menu = True
 
 while menu:
+
+    pygame.mixer.music.play(-1, 0)
+
     #Creating outer bounds
     main_grid = [[0 for i in range(10)] for i in range(20)]
     for i in range(20):
