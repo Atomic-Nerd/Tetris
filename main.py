@@ -1,6 +1,7 @@
 import pygame
 import random
 from pygame import mixer
+import time
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 
@@ -188,14 +189,6 @@ SHAPES = [
 
 paused = False
 
-current_time = pygame.time.get_ticks()
-next_move = current_time + 1000 # 1s = 1000ms
-
-next_rotate_right = current_time + 150
-next_rotate_left = current_time + 150
-
-multiplier = 1.0
-
 # ---- SOUND EDITTING ------
 
 LINE_CLEAR_WAV = pygame.mixer.Sound(f"Sounds/line_clear.wav")
@@ -231,7 +224,7 @@ class player:
         self.shape_y = determine_start_Y(self.shape)
 
         self.score = 0
-        self.lines = 0
+        self.rows = 0
 
     def newShape(self):
         self.shape = self.next_shape
@@ -240,16 +233,17 @@ class player:
         self.shape_orientation = 0
         self.next_shape = SHAPES[random.randint(0,6)]
 
+multiplier = 1.0
 def draw():
 
     screen.fill((0,0,0))
 
     scoreText = font.render(f"Score: {str(user.score)}", True, (255,255,0))
-    linesText = font.render(f"Lines: {str(user.lines)}", True, (255,255,0))
+    rowsText = font.render(f"Rows: {str(user.rows)}", True, (255,255,0))
     multiplierText = font.render(f"Speed: {round(multiplier,2)}x", True, (255, 255, 0))
 
     screen.blit(scoreText, (500, 100))
-    screen.blit(linesText, (500, 130))
+    screen.blit(rowsText, (500, 130))
     screen.blit(multiplierText, (500,160))
 
     nextText = font.render("Next:", True, (255,255,0))
@@ -329,7 +323,7 @@ def checkRow():
 
     main_grid = [row[:] for row in temp_grid]
 
-    user.lines += completed_rows
+    user.rows += completed_rows
 
     score_add = [0,40,100,300,1200]
     user.score += score_add[completed_rows]
@@ -494,10 +488,22 @@ while menu:
     temp_grid = [row[:] for row in main_grid]
 
     user = player()
-    moveUser()
     play = True
+    drawFirst()
+    draw()
+
+    current_time = pygame.time.get_ticks()
+    next_move = current_time + 1000  # 1s = 1000ms
+
+    next_rotate_right = current_time + 150
+    next_rotate_left = current_time + 150
+
+    multiplier = 1.0
+
+    first_run = True
 
     while play:
+
         pygame.time.wait(75)
 
         keys = pygame.key.get_pressed()
@@ -519,8 +525,10 @@ while menu:
 
             current_time = pygame.time.get_ticks()
 
-            if keys[pygame.K_s]:
+            if keys[pygame.K_s] and not(first_run):
                 moveUser()
+            else:
+                first_run = False
 
             if keys[pygame.K_d]:
                 moveRight()
@@ -541,8 +549,9 @@ while menu:
                 moveUser()
 
             draw()
+    del user
 
-    print ("Game Ending...")
+    print ("Game over...")
     for i in range(0,4):
         print (f"Resetting in {3-i} seconds...")
         pygame.time.wait(1000)
