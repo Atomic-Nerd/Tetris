@@ -474,15 +474,67 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
-def  draw_main_menu(cursor_index,cursor_locations):
+def drawtext(string,x,y):
+
+    text_surface = menu_font.render(string, True, (255,255,255))
+    screen.blit(text_surface, (x,y))
+
+def highscore_menu():
     pass
+
+def options_menu():
+    pass
+
+def credits_menu():
+    pass
+
+def  draw_main_menu(cursor_index,cursor_locations):
+
+    screen.fill((0, 0, 0))
+    drawtext("Main Menu", 100, 100)
+    drawtext("Play", 150, 250)
+    drawtext("Highscores", 150, 300)
+    drawtext("Options", 150, 350)
+    drawtext("Quit", 150, 400)
+    cursor_y = cursor_locations[cursor_index]
+    drawtext("*", 100, cursor_y)
+
+    pygame.display.update()
 
 def main_menu():
     global playsound
     
     cursor_index = 0
-    cursor_locations = [100,200,300,400,500]
+    cursor_locations = [250,300,350,400]
     playsound = True
+    main_menu_loop = True
+
+    while main_menu_loop:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w and cursor_index > 0:
+                    if playsound: MENU_HOVER_WAV.play()
+                    cursor_index -= 1
+                if event.key == pygame.K_s and cursor_index < 3:
+                    if playsound: MENU_HOVER_WAV.play()
+                    cursor_index += 1
+                if event.key == pygame.K_RETURN:
+                    if playsound: MENU_SELECT_WAV.play()
+                    if cursor_index == 0:
+                        main_menu_loop = False
+                    elif cursor_index == 1:
+                        highscore_menu()
+                    elif cursor_index == 2:
+                        options_menu()
+                    elif cursor_index == 3:
+                        pygame.time.wait(500)
+                        quit()
+
+        draw_main_menu(cursor_index,cursor_locations)
+
     main()
 
 def main():
@@ -563,10 +615,5 @@ def main():
             draw()
     del user
 
-    print ("Game over...")
-    for i in range(0,4):
-        print (f"Resetting in {3-i} seconds...")
-        pygame.time.wait(1000)
-    print ("Game resetting...")
-
-main_menu()
+while True:
+    main_menu()
