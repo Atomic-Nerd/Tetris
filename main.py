@@ -12,6 +12,7 @@ screen = pygame.display.set_mode((750, 600))
 pygame.display.set_caption("Tetris")
 
 font = pygame.font.SysFont('consolas', 30)
+menu_font = pygame.font.SysFont('8bitwondernominal', 40, True)
 
 #--------- MUSIC ----------
 
@@ -187,13 +188,14 @@ SHAPES = [
     ]
 ]
 
-paused = False
-
 # ---- SOUND EDITTING ------
 
-LINE_CLEAR_WAV = pygame.mixer.Sound(f"Sounds/line_clear.wav")
-GAME_OVER_WAV = pygame.mixer.Sound(f"Sounds/game_over.wav")
-PAUSE_WAV = pygame.mixer.Sound(f"Sounds/pause.wav")
+LINE_CLEAR_WAV = pygame.mixer.Sound("Sounds/line_clear.wav")
+GAME_OVER_WAV = pygame.mixer.Sound("Sounds/game_over.wav")
+PAUSE_WAV = pygame.mixer.Sound("Sounds/pause.wav")
+
+MENU_SELECT_WAV = pygame.mixer.Sound("Sounds/menu_select.wav")
+MENU_HOVER_WAV = pygame.mixer.Sound("Sounds/menu_hover.wav")
 
 music_volume = 0.1
 effect_volume = 0.4
@@ -451,7 +453,7 @@ def moveUser():
             multiplier += 0.05
             drawFirst()
         else:
-            pygame.mixer.music.stop()
+            if playsound: pygame.mixer.music.stop()
             GAME_OVER_WAV.play()
             play = False
 
@@ -472,13 +474,22 @@ def drawPaused():
     screen.blit(s, (0, 0))
     pygame.display.update()
 
-menu = True
+def  draw_main_menu(cursor_index,cursor_locations):
+    pass
 
-while menu:
+def main_menu():
+    global playsound
+    
+    cursor_index = 0
+    cursor_locations = [100,200,300,400,500]
+    playsound = True
+    main()
 
-    pygame.mixer.music.play(-1, 0)
+def main():
+    global main_grid, temp_grid, user, current_time, next_move, next_rotate_right, next_rotate_left, play, first_run, multiplier, paused
 
-    #Creating outer bounds
+    if playsound: pygame.mixer.music.play(-1, 0)
+
     main_grid = [[0 for i in range(10)] for i in range(20)]
     for i in range(20):
         main_grid[i].insert(0,"X")
@@ -488,8 +499,9 @@ while menu:
     temp_grid = [row[:] for row in main_grid]
 
     user = player()
-    play = True
     drawFirst()
+    play = True
+    paused = False
     draw()
 
     current_time = pygame.time.get_ticks()
@@ -514,12 +526,12 @@ while menu:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 paused = not paused
                 if paused:
-                    pygame.mixer.music.pause()
+                    if playsound: pygame.mixer.music.pause()
                     PAUSE_WAV.play()
                     drawPaused()
                 else:
                     PAUSE_WAV.play()
-                    pygame.mixer.music.unpause()
+                    if playsound: pygame.mixer.music.unpause()
 
         if not(paused):
 
@@ -556,3 +568,5 @@ while menu:
         print (f"Resetting in {3-i} seconds...")
         pygame.time.wait(1000)
     print ("Game resetting...")
+
+main_menu()
