@@ -205,6 +205,9 @@ pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV,effect_volume)
 pygame.mixer.Sound.set_volume(GAME_OVER_WAV,effect_volume)
 pygame.mixer.Sound.set_volume(PAUSE_WAV,0.2)
 
+playsound = True
+hardmode = False
+
 def determine_start_Y(shape):
     shape_index = SHAPES.index(shape)
 
@@ -319,7 +322,7 @@ def checkRow():
             temp_grid[0].insert(0, "X")
             temp_grid[0].append("X")
             completed_rows += 1
-            LINE_CLEAR_WAV.play()
+            if playsound: LINE_CLEAR_WAV.play()
         else:
             y -= 1
 
@@ -445,16 +448,20 @@ def moveUser():
                 if user.shape[user.shape_orientation][j][i] != 0:
                     if user.shape_y+j >= 0:
                         temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[user.shape_orientation][j][i]
+                        temp_grid[user.shape_y + j][user.shape_x + i + 1] = user.shape[user.shape_orientation][j][i]
     else:
         if not (checkEnd()):
             user.newShape()
             main_grid = [row[:] for row in temp_grid]
             checkRow()
-            multiplier += 0.05
+            if hardmode:
+                multiplier += 0.3
+            else:
+                multiplier += 0.05
             drawFirst()
         else:
             if playsound: pygame.mixer.music.stop()
-            GAME_OVER_WAV.play()
+            if playsound: GAME_OVER_WAV.play()
             play = False
 
 def drawFirst():
@@ -480,33 +487,116 @@ def drawtext(string,x,y):
     screen.blit(text_surface, (x,y))
 
 def highscore_menu():
-    pass
+
+    highscore_menu_loop = True
+
+    while highscore_menu_loop:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if playsound: MENU_SELECT_WAV.play()
+                    highscore_menu_loop = False
+
+        draw_highscore_menu()
+
+def draw_highscore_menu():
+
+    screen.fill((0, 0, 0))
+
+    drawtext("Highscores", 50, 50)
+    drawtext("Back", 200, 500)
+    drawtext("*", 150, 500)
+
+    pygame.display.update()
 
 def options_menu():
-    pass
+    global playsound, hardmode, sound_on_off, hardmode_on_off
 
-def credits_menu():
-    pass
+    cursor_index = 0
+    cursor_locations = [200, 250, 300, 350]
+    options_menu_loop = True
+    if playsound == True:
+        sound_on_off = "on"
+    else:
+        sound_on_off = "off"
+
+    if hardmode == True:
+        hardmode_on_off = "on"
+    else:
+        hardmode_on_off = "off"
+
+    while options_menu_loop:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w and cursor_index > 0:
+                    if playsound: MENU_HOVER_WAV.play()
+                    cursor_index -= 1
+                if event.key == pygame.K_s and cursor_index < 2:
+                    if playsound: MENU_HOVER_WAV.play()
+                    cursor_index += 1
+                if event.key == pygame.K_RETURN:
+                    if playsound: MENU_SELECT_WAV.play()
+                    if cursor_index == 0:
+                        if playsound:
+                            sound_on_off = "off"
+                            playsound = False
+                        else:
+                            sound_on_off = "on"
+                            playsound = True
+                    elif cursor_index == 1:
+                        if hardmode:
+                            hardmode_on_off = "off"
+                            hardmode = False
+                        else:
+                            hardmode_on_off = "on"
+                            hardmode = True
+                    elif cursor_index == 2:
+                        options_menu_loop = False
+
+        draw_options_menu(cursor_index, cursor_locations)
+
+def draw_options_menu(cursor_index, cursor_locations):
+
+    screen.fill((0, 0, 0))
+
+    drawtext("Options", 50, 50)
+    drawtext(f"Sound {sound_on_off}", 150, 200)
+    drawtext(f"Hardmode {hardmode_on_off}", 150, 250)
+    drawtext("Back", 100, 500)
+
+    cursor_y = cursor_locations[cursor_index]
+    if cursor_index == 2:
+        drawtext("*", 50, 500)
+    else:
+        drawtext("*", 100, cursor_y)
+
+    pygame.display.update()
 
 def  draw_main_menu(cursor_index,cursor_locations):
 
     screen.fill((0, 0, 0))
-    drawtext("Main Menu", 100, 100)
-    drawtext("Play", 150, 250)
-    drawtext("Highscores", 150, 300)
-    drawtext("Options", 150, 350)
-    drawtext("Quit", 150, 400)
+
+    drawtext("Main Menu", 50, 50)
+    drawtext("Play", 200, 200)
+    drawtext("Highscores", 200, 250)
+    drawtext("Options", 200, 300)
+    drawtext("Quit", 200, 350)
     cursor_y = cursor_locations[cursor_index]
-    drawtext("*", 100, cursor_y)
+    drawtext("*", 150, cursor_y)
 
     pygame.display.update()
 
 def main_menu():
-    global playsound
+    global playsound, hardmode
     
     cursor_index = 0
-    cursor_locations = [250,300,350,400]
-    playsound = True
+    cursor_locations = [200,250,300,350]
     main_menu_loop = True
 
     while main_menu_loop:
@@ -562,7 +652,10 @@ def main():
     next_rotate_right = current_time + 150
     next_rotate_left = current_time + 150
 
-    multiplier = 1.0
+    if hardmode:
+        multiplier = 2.0
+    else:
+        multiplier = 1.0
 
     first_run = True
 
@@ -579,10 +672,10 @@ def main():
                 paused = not paused
                 if paused:
                     if playsound: pygame.mixer.music.pause()
-                    PAUSE_WAV.play()
+                    if playsound: PAUSE_WAV.play()
                     drawPaused()
                 else:
-                    PAUSE_WAV.play()
+                    if playsound: PAUSE_WAV.play()
                     if playsound: pygame.mixer.music.unpause()
 
         if not(paused):
