@@ -448,7 +448,7 @@ def moveUser():
             user.newShape()
             main_grid = [row[:] for row in temp_grid]
             checkRow()
-            multiplier += 0.01
+            multiplier += 0.05
             drawFirst()
         else:
             pygame.mixer.music.stop()
