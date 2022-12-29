@@ -541,7 +541,6 @@ def options_menu():
                     if playsound: MENU_HOVER_WAV.play()
                     cursor_index += 1
                 if event.key == pygame.K_RETURN:
-                    if playsound: MENU_SELECT_WAV.play()
                     if cursor_index == 0:
                         if playsound:
                             sound_on_off = "off"
@@ -558,6 +557,7 @@ def options_menu():
                             hardmode = True
                     elif cursor_index == 2:
                         options_menu_loop = False
+                    if playsound: MENU_SELECT_WAV.play()
 
         draw_options_menu(cursor_index, cursor_locations)
 
@@ -707,6 +707,7 @@ def main():
 
             draw()
     del user
+    pygame.time.wait(3000)
 
 while True:
     main_menu()
