@@ -356,7 +356,7 @@ def checkRow():
 
     user.rows += completed_rows
 
-    score_add = [0,40,100,300,1200]
+    score_add = [0,100,300,500,800]
     user.score += score_add[completed_rows]
     if user.score > user.highscore:
         user.highscore = user.score
