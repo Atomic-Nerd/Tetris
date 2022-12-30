@@ -237,6 +237,8 @@ def determine_start_Y(shape):
 class player:
     def __init__(self):
         self.name = "N/A"
+        self.highscore = 0
+
         self.shape_x = 3
 
         self.shape = SHAPES[random.randint(0,6)]
@@ -263,11 +265,13 @@ def draw():
 
     screen.fill((0,0,0))
 
+    PBText = font.render(f"PB: {str(user.highscore)}", True, (255,255,0))
     scoreText = font.render(f"Score: {str(user.score)}", True, (255,255,0))
     rowsText = font.render(f"Rows: {str(user.rows)}", True, (255,255,0))
     multiplierText = font.render(f"Speed: {round(multiplier,2)}x", True, (255, 255, 0))
     HSText = font.render(f"Highscore: {highscore}", True, (255, 255, 0))
 
+    screen.blit(PBText, (500,40))
     screen.blit(scoreText, (500, 100))
     screen.blit(rowsText, (500, 130))
     screen.blit(multiplierText, (500,160))
@@ -354,6 +358,8 @@ def checkRow():
 
     score_add = [0,40,100,300,1200]
     user.score += score_add[completed_rows]
+    if user.score > user.highscore:
+        user.highscore = user.score
 
 def checkEnd():
     coords = returnPositions(user.shape[user.shape_orientation],user.shape_x,user.shape_y)
@@ -688,7 +694,7 @@ def input_score(name,user_score):
 def select_player():
 
     cursor_index = 0
-    cursor_locations = [200, 400]
+    cursor_locations = [200, 400, 500]
     select_player_loop = True
 
     while select_player_loop:
@@ -697,18 +703,20 @@ def select_player():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w and cursor_index == 1:
+                if event.key == pygame.K_w and cursor_index > 0:
                     if playsound: MENU_HOVER_WAV.play()
-                    cursor_index = 0
-                if event.key == pygame.K_s and cursor_index == 0:
+                    cursor_index -= 1
+                if event.key == pygame.K_s and cursor_index < 2:
                     if playsound: MENU_HOVER_WAV.play()
-                    cursor_index = 1
+                    cursor_index += 1
                 if event.key == pygame.K_RETURN:
                     if playsound: MENU_SELECT_WAV.play()
                     if cursor_index == 0:
                         oldPlayer()
-                    else:
+                    elif cursor_index == 1:
                         newPlayer()
+                    else:
+                        main_menu()
                     select_player_loop = False
 
         draw_select_player(cursor_index,cursor_locations)
@@ -718,9 +726,15 @@ def draw_select_player(cursor_index,cursor_locations):
 
     drawtext("Player Type", 50, 50)
 
-    drawtext("Saved Player", 100, 200)
-    drawtext("New Player", 100, 400)
-    drawtext("*", 50, cursor_locations[cursor_index])
+    drawtext("Saved Player", 125, 200)
+    drawtext("New Player", 125, 400)
+
+    if cursor_index == 2:
+        drawtext("*", 50, cursor_locations[cursor_index])
+    else:
+        drawtext("*", 75, cursor_locations[cursor_index])
+
+    drawtext("Back", 100, 500)
 
     pygame.display.update()
 
@@ -787,11 +801,14 @@ def oldPlayer():
     oldPlayer_loop = True
     db = return_json()
     allNames = db["Names"]
+    allScores = db["Scores"]
     if len(allNames) < 7:
         for i in range(0,7-len(allNames)):
             allNames.append("na")
+            allScores.append("0")
     visibleNames = allNames[0:7]
-    visibleNames_offset = 0
+    visibleScores = allScores[0:7]
+    visible_offset = 0
 
     while oldPlayer_loop:
         for event in pygame.event.get():
@@ -803,33 +820,37 @@ def oldPlayer():
                         if playsound: MENU_HOVER_WAV.play()
                         cursor_index -= 1
                     else:
-                        if visibleNames_offset > 0:
+                        if visible_offset > 0:
                             if playsound: MENU_HOVER_WAV.play()
-                            visibleNames_offset -= 1
-                            visibleNames = allNames[0+visibleNames_offset:7+visibleNames_offset]
+                            visible_offset -= 1
+                            visibleNames = allNames[0+visible_offset:7+visible_offset]
+                            visibleScores = allScores[0+visible_offset:7+visible_offset]
                 if event.key == pygame.K_s:
                     if cursor_index < 6:
                         if playsound: MENU_HOVER_WAV.play()
                         cursor_index += 1
                     else:
-                        if visibleNames_offset < len(allNames)-7:
+                        if visible_offset < len(allNames)-7:
                             if playsound: MENU_HOVER_WAV.play()
-                            visibleNames_offset += 1
-                            visibleNames = allNames[0+visibleNames_offset:7+visibleNames_offset]
+                            visible_offset += 1
+                            visibleNames = allNames[0+visible_offset:7+visible_offset]
+                            visibleScores = allScores[0+visible_offset:7+visible_offset]
                 if event.key == pygame.K_RETURN:
                     if playsound: MENU_SELECT_WAV.play()
                     oldPlayer_loop = False
                     user.name = visibleNames[cursor_index]
+                    user.highscore = visibleScores[cursor_index]
 
-        draw_oldPlayer(cursor_index,cursor_locations,visibleNames)
+        draw_oldPlayer(cursor_index,cursor_locations,visibleNames,visibleScores)
 
-def draw_oldPlayer(cursor_index,cursor_locations,names):
+def draw_oldPlayer(cursor_index,cursor_locations,names,scores):
     screen.fill((0, 0, 0))
 
     drawtext("Select Player", 50, 50)
 
     for i in range(len(names)):
         drawtext(names[i],100,150+50*i)
+        drawtext(str(scores[i]),400,150+50*i)
 
     drawtext("*", 50, cursor_locations[cursor_index])
 
