@@ -41,6 +41,8 @@ YELLOW = (255,255,0)
 AQUA = (0,255,255)
 ORANGE = (249,146,69)
 PURPLE = (230,230,250)
+WHITE = (255,255,255)
+
 BOX_COLOURS = [None,RED,BLUE,GREEN,YELLOW,AQUA,ORANGE,PURPLE]
 
 SHAPES = [
@@ -251,6 +253,9 @@ class player:
         self.next_shape = SHAPES[random.randint(0,6)]
 
 multiplier = 1.0
+db = return_json()
+highscore = db["Scores"][0]
+
 def draw():
 
     screen.fill((0,0,0))
@@ -258,10 +263,12 @@ def draw():
     scoreText = font.render(f"Score: {str(user.score)}", True, (255,255,0))
     rowsText = font.render(f"Rows: {str(user.rows)}", True, (255,255,0))
     multiplierText = font.render(f"Speed: {round(multiplier,2)}x", True, (255, 255, 0))
+    HSText = font.render(f"Highscore: {highscore}", True, (255, 255, 0))
 
     screen.blit(scoreText, (500, 100))
     screen.blit(rowsText, (500, 130))
     screen.blit(multiplierText, (500,160))
+    screen.blit(HSText, (0,0))
 
     nextText = font.render("Next:", True, (255,255,0))
 
@@ -529,9 +536,9 @@ def draw_highscore_menu():
 
     drawtext("Highscores", 50, 50)
 
-    drawtext(f"1st   {first_name}   {first_score}", 100, 170)
-    drawtext(f"2nd   {second_name}   {second_score}", 100, 270)
-    drawtext(f"3rd   {third_name}   {third_score}", 100, 370)
+    drawtext(f"1st  {first_name} {first_score}", 30, 170)
+    drawtext(f"2nd  {second_name} {second_score}", 30, 270)
+    drawtext(f"3rd  {third_name} {third_score}", 30, 370)
 
     drawtext("Back", 100, 500)
     drawtext("*", 50, 500)
@@ -604,7 +611,7 @@ def draw_options_menu(cursor_index, cursor_locations):
 
     pygame.display.update()
 
-def  draw_main_menu(cursor_index,cursor_locations):
+def draw_main_menu(cursor_index,cursor_locations):
 
     screen.fill((0, 0, 0))
 
@@ -617,6 +624,101 @@ def  draw_main_menu(cursor_index,cursor_locations):
     drawtext("*", 150, cursor_y)
 
     pygame.display.update()
+
+def input_score():
+
+    input_score_loop = True
+    name = ""
+
+    while input_score_loop:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    if len(name) > 0:
+                        if playsound: MENU_HOVER_WAV.play()
+                        name = name[:-1]
+                elif event.key == pygame.K_RETURN:
+                    input_score_loop = False
+                    if playsound: MENU_SELECT_WAV.play()
+                else:
+                    if len(name) < 12:
+                        if playsound: MENU_HOVER_WAV.play()
+                        name += event.unicode
+                    else:
+                        pass
+
+
+        draw_input_score(name,False,False,False)
+
+    wait_for_input = True
+    isNew = inputScore(name,user.score)
+
+    while wait_for_input:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    wait_for_input = False
+                    if playsound: MENU_SELECT_WAV.play()
+
+        draw_input_score(name,True,True,isNew)
+
+def draw_input_score(name,show_star,isAdded,isNew):
+    screen.fill((0, 0, 0))
+
+    drawtext("Input Name", 50, 50)
+
+    pygame.draw.rect(screen,WHITE,(100,250,550,100),2)
+    drawtext(name, 125, 275)
+
+    drawtext("Main menu", 100, 500)
+    if show_star:
+        drawtext("*", 50, 500)
+
+    if isAdded:
+        if isNew:
+            drawtext("User added", 100, 400)
+        else:
+            drawtext("User found", 100, 400)
+
+    pygame.display.update()
+
+def inputScore(name,user_score):
+
+    db = return_json()
+
+    name = name.capitalize()
+    if name in db["Names"]:
+        index = db["Names"].index(name)
+        if user_score > db["Scores"][index]:
+            db["Scores"].pop(index)
+            db["Names"].pop(index)
+            for index, score in enumerate(db["Scores"]):
+                if user_score > score:
+                    db["Scores"].insert(index, user_score)
+                    db["Names"].insert(index, name)
+                    break
+        dump_json(db)
+        return False
+    else:
+        added = False
+        for index,score in enumerate(db["Scores"]):
+            if user_score > score:
+                db["Scores"].insert(index,user_score)
+                db["Names"].insert(index,name)
+                added = True
+                break
+
+        if not(added):
+            db["Scores"].append(user_score)
+            db["Names"].append(name)
+
+        dump_json(db)
+        return True
 
 def main_menu():
     global playsound, hardmode
@@ -732,8 +834,10 @@ def main():
                 moveUser()
 
             draw()
-    del user
+
     pygame.time.wait(3000)
+    input_score()
+    del user
 
 while True:
     main_menu()
