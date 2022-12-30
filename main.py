@@ -977,7 +977,6 @@ def main():
 
     pygame.time.wait(3000)
     input_score(user.name,user.score)
-    del user
 
 while True:
     main_menu()

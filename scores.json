@@ -1,14 +1,1 @@
-{
-  "Names": [
-    "Jonny",
-    "Caleb",
-    "Paul",
-    "Karen"
-  ],
-  "Scores": [
-    0,
-    0,
-    0,
-    0
-  ]
-}
+{"Names": ["Jonny", "Caleb", "Paul", "Karen"], "Scores": [1300, 0, 0, 0]}
