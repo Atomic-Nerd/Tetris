@@ -217,7 +217,9 @@ effect_volume = 0.4
 pygame.mixer.music.set_volume(music_volume)
 pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV,effect_volume)
 pygame.mixer.Sound.set_volume(GAME_OVER_WAV,effect_volume)
-pygame.mixer.Sound.set_volume(PAUSE_WAV,0.2)
+pygame.mixer.Sound.set_volume(PAUSE_WAV,effect_volume)
+pygame.mixer.Sound.set_volume(MENU_SELECT_WAV,effect_volume)
+pygame.mixer.Sound.set_volume(MENU_HOVER_WAV,effect_volume)
 
 playsound = True
 hardmode = False
@@ -545,11 +547,19 @@ def draw_highscore_menu():
 
     pygame.display.update()
 
+def updateVolumes():
+    pygame.mixer.music.set_volume(music_volume)
+    pygame.mixer.Sound.set_volume(LINE_CLEAR_WAV, effect_volume)
+    pygame.mixer.Sound.set_volume(GAME_OVER_WAV, effect_volume)
+    pygame.mixer.Sound.set_volume(PAUSE_WAV, effect_volume)
+    pygame.mixer.Sound.set_volume(MENU_SELECT_WAV, effect_volume)
+    pygame.mixer.Sound.set_volume(MENU_HOVER_WAV, effect_volume)
+
 def options_menu():
-    global playsound, hardmode, sound_on_off, hardmode_on_off
+    global playsound, hardmode, sound_on_off, hardmode_on_off, effect_volume, music_volume
 
     cursor_index = 0
-    cursor_locations = [200, 250, 300, 350]
+    cursor_locations = [200, 250, 300, 350, "N/A"]
     options_menu_loop = True
     if playsound == True:
         sound_on_off = "on"
@@ -570,9 +580,25 @@ def options_menu():
                 if event.key == pygame.K_w and cursor_index > 0:
                     if playsound: MENU_HOVER_WAV.play()
                     cursor_index -= 1
-                if event.key == pygame.K_s and cursor_index < 2:
+                if event.key == pygame.K_s and cursor_index < 4:
                     if playsound: MENU_HOVER_WAV.play()
                     cursor_index += 1
+                if event.key == pygame.K_d:
+                    if cursor_index == 2:
+                        if effect_volume > 0:
+                            effect_volume -= 0.01
+                    elif cursor_index == 3:
+                        if music_volume > 0:
+                            music_volume -= 0.01
+                    updateVolumes()
+                if event.key == pygame.K_a:
+                    if cursor_index == 2:
+                        if effect_volume < 1.0:
+                            effect_volume += 0.01
+                    elif cursor_index == 3:
+                        if music_volume < 1.0:
+                            music_volume += 0.01
+                    updateVolumes()
                 if event.key == pygame.K_RETURN:
                     if cursor_index == 0:
                         if playsound:
@@ -588,7 +614,7 @@ def options_menu():
                         else:
                             hardmode_on_off = "on"
                             hardmode = True
-                    elif cursor_index == 2:
+                    elif cursor_index == 4:
                         options_menu_loop = False
                     if playsound: MENU_SELECT_WAV.play()
 
@@ -601,10 +627,12 @@ def draw_options_menu(cursor_index, cursor_locations):
     drawtext("Options", 50, 50)
     drawtext(f"Sound {sound_on_off}", 150, 200)
     drawtext(f"Hardmode {hardmode_on_off}", 150, 250)
+    drawtext(f"Effects {round(effect_volume*100)}", 150, 300)
+    drawtext(f"Music {round(music_volume*100)}", 150, 350)
     drawtext("Back", 100, 500)
 
     cursor_y = cursor_locations[cursor_index]
-    if cursor_index == 2:
+    if cursor_index == 4:
         drawtext("*", 50, 500)
     else:
         drawtext("*", 100, cursor_y)
@@ -756,7 +784,7 @@ def main_menu():
     main()
 
 def main():
-    global main_grid, temp_grid, user, current_time, next_move, next_rotate_right, next_rotate_left, play, first_run, multiplier, paused
+    global main_grid, temp_grid, user, current_time, next_move, next_rotate_right, next_rotate_left, play, first_run, multiplier, paused, effect_volume, music_volume
 
     if playsound: pygame.mixer.music.play(-1, 0)
 
