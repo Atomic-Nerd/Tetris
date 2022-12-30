@@ -776,7 +776,6 @@ def main_menu():
                     elif cursor_index == 2:
                         options_menu()
                     elif cursor_index == 3:
-                        pygame.time.wait(500)
                         quit()
 
         draw_main_menu(cursor_index,cursor_locations)
