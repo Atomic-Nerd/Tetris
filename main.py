@@ -2,6 +2,18 @@ import pygame
 import random
 from pygame import mixer
 import time
+import json
+
+def return_json():
+    a_file = open("scores.json", "r")
+    json_object = json.load(a_file)
+    a_file.close()
+    return json_object
+
+def dump_json(json_object):
+    a_file = open("scores.json", "w")
+    json.dump(json_object, a_file)
+    a_file.close()
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 
@@ -455,7 +467,7 @@ def moveUser():
             main_grid = [row[:] for row in temp_grid]
             checkRow()
             if hardmode:
-                multiplier += 0.3
+                multiplier += 0.2
             else:
                 multiplier += 0.05
             drawFirst()
@@ -506,9 +518,23 @@ def draw_highscore_menu():
 
     screen.fill((0, 0, 0))
 
+    db = return_json()
+    first_name = db["Names"][0]
+    second_name = db["Names"][1]
+    third_name = db["Names"][2]
+
+    first_score = db["Scores"][0]
+    second_score = db["Scores"][1]
+    third_score = db["Scores"][2]
+
     drawtext("Highscores", 50, 50)
-    drawtext("Back", 200, 500)
-    drawtext("*", 150, 500)
+
+    drawtext(f"1st   {first_name}   {first_score}", 100, 170)
+    drawtext(f"2nd   {second_name}   {second_score}", 100, 270)
+    drawtext(f"3rd   {third_name}   {third_score}", 100, 370)
+
+    drawtext("Back", 100, 500)
+    drawtext("*", 50, 500)
 
     pygame.display.update()
 
