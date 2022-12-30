@@ -585,19 +585,19 @@ def options_menu():
                     cursor_index += 1
                 if event.key == pygame.K_d:
                     if cursor_index == 2:
-                        if effect_volume > 0:
-                            effect_volume -= 0.01
-                    elif cursor_index == 3:
-                        if music_volume > 0:
-                            music_volume -= 0.01
-                    updateVolumes()
-                if event.key == pygame.K_a:
-                    if cursor_index == 2:
                         if effect_volume < 1.0:
                             effect_volume += 0.01
                     elif cursor_index == 3:
                         if music_volume < 1.0:
                             music_volume += 0.01
+                    updateVolumes()
+                if event.key == pygame.K_a:
+                    if cursor_index == 2:
+                        if effect_volume > 0:
+                            effect_volume -= 0.01
+                    elif cursor_index == 3:
+                        if music_volume > 0:
+                            music_volume -= 0.01
                     updateVolumes()
                 if event.key == pygame.K_RETURN:
                     if cursor_index == 0:
