@@ -236,6 +236,7 @@ def determine_start_Y(shape):
 
 class player:
     def __init__(self):
+        self.name = "N/A"
         self.shape_x = 3
 
         self.shape = SHAPES[random.randint(0,6)]
@@ -653,69 +654,7 @@ def draw_main_menu(cursor_index,cursor_locations):
 
     pygame.display.update()
 
-def input_score():
-
-    input_score_loop = True
-    name = ""
-
-    while input_score_loop:
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_BACKSPACE:
-                    if len(name) > 0:
-                        if playsound: MENU_HOVER_WAV.play()
-                        name = name[:-1]
-                elif event.key == pygame.K_RETURN:
-                    input_score_loop = False
-                    if playsound: MENU_SELECT_WAV.play()
-                else:
-                    if len(name) < 12:
-                        if playsound: MENU_HOVER_WAV.play()
-                        name += event.unicode
-                    else:
-                        pass
-
-
-        draw_input_score(name,False,False,False)
-
-    wait_for_input = True
-    isNew = inputScore(name,user.score)
-
-    while wait_for_input:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    wait_for_input = False
-                    if playsound: MENU_SELECT_WAV.play()
-
-        draw_input_score(name,True,True,isNew)
-
-def draw_input_score(name,show_star,isAdded,isNew):
-    screen.fill((0, 0, 0))
-
-    drawtext("Input Name", 50, 50)
-
-    pygame.draw.rect(screen,WHITE,(100,250,550,100),2)
-    drawtext(name, 125, 275)
-
-    drawtext("Main menu", 100, 500)
-    if show_star:
-        drawtext("*", 50, 500)
-
-    if isAdded:
-        if isNew:
-            drawtext("User added", 100, 400)
-        else:
-            drawtext("User found", 100, 400)
-
-    pygame.display.update()
-
-def inputScore(name,user_score):
+def input_score(name,user_score):
 
     db = return_json()
 
@@ -731,7 +670,6 @@ def inputScore(name,user_score):
                     db["Names"].insert(index, name)
                     break
         dump_json(db)
-        return False
     else:
         added = False
         for index,score in enumerate(db["Scores"]):
@@ -746,10 +684,159 @@ def inputScore(name,user_score):
             db["Names"].append(name)
 
         dump_json(db)
-        return True
+
+def select_player():
+
+    cursor_index = 0
+    cursor_locations = [200, 400]
+    select_player_loop = True
+
+    while select_player_loop:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w and cursor_index == 1:
+                    if playsound: MENU_HOVER_WAV.play()
+                    cursor_index = 0
+                if event.key == pygame.K_s and cursor_index == 0:
+                    if playsound: MENU_HOVER_WAV.play()
+                    cursor_index = 1
+                if event.key == pygame.K_RETURN:
+                    if playsound: MENU_SELECT_WAV.play()
+                    if cursor_index == 0:
+                        oldPlayer()
+                    else:
+                        newPlayer()
+                    select_player_loop = False
+
+        draw_select_player(cursor_index,cursor_locations)
+
+def draw_select_player(cursor_index,cursor_locations):
+    screen.fill((0, 0, 0))
+
+    drawtext("Player Type", 50, 50)
+
+    drawtext("Saved Player", 100, 200)
+    drawtext("New Player", 100, 400)
+    drawtext("*", 50, cursor_locations[cursor_index])
+
+    pygame.display.update()
+
+def newPlayer():
+    global user
+    newPlayer_loop = True
+    name = ""
+
+    while newPlayer_loop:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    if len(name) > 0:
+                        if playsound: MENU_HOVER_WAV.play()
+                        name = name[:-1]
+                elif event.key == pygame.K_RETURN:
+                    newPlayer_loop = False
+                    if playsound: MENU_SELECT_WAV.play()
+                else:
+                    if len(name) < 12:
+                        if playsound: MENU_HOVER_WAV.play()
+                        name += event.unicode
+
+        draw_newPlayer(name, False)
+
+    wait_for_input = True
+
+    while wait_for_input:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    wait_for_input = False
+                    if playsound: MENU_SELECT_WAV.play()
+
+        draw_newPlayer(name, True)
+
+    user.name = name
+
+def draw_newPlayer(name,show_star):
+    screen.fill((0, 0, 0))
+
+    drawtext("Input Name", 50, 50)
+
+    pygame.draw.rect(screen,WHITE,(100,250,550,100),2)
+    drawtext(name, 125, 275)
+
+    drawtext("Play", 100, 500)
+    if show_star:
+        drawtext("*", 50, 500)
+        drawtext("User added", 100, 400)
+
+    pygame.display.update()
+
+def oldPlayer():
+    global user
+
+    cursor_index = 0
+    cursor_locations = [150, 200, 250, 300,350,400,450]
+    oldPlayer_loop = True
+    db = return_json()
+    allNames = db["Names"]
+    if len(allNames) < 7:
+        for i in range(0,7-len(allNames)):
+            allNames.append("na")
+    visibleNames = allNames[0:7]
+    visibleNames_offset = 0
+
+    while oldPlayer_loop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    if cursor_index > 0:
+                        if playsound: MENU_HOVER_WAV.play()
+                        cursor_index -= 1
+                    else:
+                        if visibleNames_offset > 0:
+                            if playsound: MENU_HOVER_WAV.play()
+                            visibleNames_offset -= 1
+                            visibleNames = allNames[0+visibleNames_offset:7+visibleNames_offset]
+                if event.key == pygame.K_s:
+                    if cursor_index < 6:
+                        if playsound: MENU_HOVER_WAV.play()
+                        cursor_index += 1
+                    else:
+                        if visibleNames_offset < len(allNames)-7:
+                            if playsound: MENU_HOVER_WAV.play()
+                            visibleNames_offset += 1
+                            visibleNames = allNames[0+visibleNames_offset:7+visibleNames_offset]
+                if event.key == pygame.K_RETURN:
+                    if playsound: MENU_SELECT_WAV.play()
+                    oldPlayer_loop = False
+                    user.name = visibleNames[cursor_index]
+
+        draw_oldPlayer(cursor_index,cursor_locations,visibleNames)
+
+def draw_oldPlayer(cursor_index,cursor_locations,names):
+    screen.fill((0, 0, 0))
+
+    drawtext("Select Player", 50, 50)
+
+    for i in range(len(names)):
+        drawtext(names[i],100,150+50*i)
+
+    drawtext("*", 50, cursor_locations[cursor_index])
+
+    pygame.display.update()
 
 def main_menu():
-    global playsound, hardmode
+    global playsound, hardmode, user
     
     cursor_index = 0
     cursor_locations = [200,250,300,350]
@@ -770,6 +857,7 @@ def main_menu():
                 if event.key == pygame.K_RETURN:
                     if playsound: MENU_SELECT_WAV.play()
                     if cursor_index == 0:
+                        user = player()
                         main_menu_loop = False
                     elif cursor_index == 1:
                         highscore_menu()
@@ -780,10 +868,11 @@ def main_menu():
 
         draw_main_menu(cursor_index,cursor_locations)
 
+    select_player()
     main()
 
 def main():
-    global main_grid, temp_grid, user, current_time, next_move, next_rotate_right, next_rotate_left, play, first_run, multiplier, paused, effect_volume, music_volume
+    global main_grid, user, temp_grid, current_time, next_move, next_rotate_right, next_rotate_left, play, first_run, multiplier, paused, effect_volume, music_volume
 
     if playsound: pygame.mixer.music.play(-1, 0)
 
@@ -795,7 +884,6 @@ def main():
     main_grid.append(["X" for i in range(12)])
     temp_grid = [row[:] for row in main_grid]
 
-    user = player()
     drawFirst()
     play = True
     paused = False
@@ -867,7 +955,7 @@ def main():
             draw()
 
     pygame.time.wait(3000)
-    input_score()
+    input_score(user.name,user.score)
     del user
 
 while True:

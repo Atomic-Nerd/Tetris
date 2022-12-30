@@ -1,1 +1,14 @@
-{"Names": ["Jonny", "Karen", "Test", "Paul", "NA", "NA", "NA", "Emma"], "Scores": [3900, 2840, 1500, 120, 0, 0, 0, 0]}
+{
+  "Names": [
+    "Jonny",
+    "Caleb",
+    "Karen",
+    "Paul"
+  ],
+  "Scores": [
+    5740,
+    320,
+    200,
+    120
+  ]
+}
