@@ -838,6 +838,10 @@ def main():
 
             current_time = pygame.time.get_ticks()
 
+            if keys[pygame.K_BACKSPACE]:
+                pygame.mixer.music.stop()
+                main_menu()
+
             if keys[pygame.K_s] and not(first_run):
                 moveUser()
             else:
