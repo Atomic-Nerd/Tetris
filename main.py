@@ -797,17 +797,17 @@ def oldPlayer():
     global user
 
     cursor_index = 0
-    cursor_locations = [150, 200, 250, 300,350,400,450]
     oldPlayer_loop = True
     db = return_json()
     allNames = db["Names"]
     allScores = db["Scores"]
     if len(allNames) < 7:
-        for i in range(0,7-len(allNames)):
-            allNames.append("na")
-            allScores.append("0")
-    visibleNames = allNames[0:7]
-    visibleScores = allScores[0:7]
+        visibleNames = allNames[0:len(allNames)]
+        visibleScores = allScores[0:len(allNames)]
+    else:
+        visibleNames = allNames[0:7]
+        visibleScores = allScores[0:7]
+    cursor_locations = [(150+i*50) for i in range(len(visibleNames))]
     visible_offset = 0
 
     while oldPlayer_loop:
@@ -826,15 +826,16 @@ def oldPlayer():
                             visibleNames = allNames[0+visible_offset:7+visible_offset]
                             visibleScores = allScores[0+visible_offset:7+visible_offset]
                 if event.key == pygame.K_s:
-                    if cursor_index < 6:
+                    if cursor_index < len(visibleNames)-1:
                         if playsound: MENU_HOVER_WAV.play()
                         cursor_index += 1
                     else:
-                        if visible_offset < len(allNames)-7:
-                            if playsound: MENU_HOVER_WAV.play()
-                            visible_offset += 1
-                            visibleNames = allNames[0+visible_offset:7+visible_offset]
-                            visibleScores = allScores[0+visible_offset:7+visible_offset]
+                        if len(visibleNames) == 7:
+                            if visible_offset < len(allNames)-7:
+                                if playsound: MENU_HOVER_WAV.play()
+                                visible_offset += 1
+                                visibleNames = allNames[0+visible_offset:7+visible_offset]
+                                visibleScores = allScores[0+visible_offset:7+visible_offset]
                 if event.key == pygame.K_RETURN:
                     if playsound: MENU_SELECT_WAV.play()
                     oldPlayer_loop = False
@@ -851,6 +852,10 @@ def draw_oldPlayer(cursor_index,cursor_locations,names,scores):
     for i in range(len(names)):
         drawtext(names[i],100,150+50*i)
         drawtext(str(scores[i]),400,150+50*i)
+
+    for i in range(7-len(names)):
+        drawtext("na", 100, 150+50*len(names) + 50 * i)
+        drawtext("0", 400, 150+50*len(names) + 50 * i)
 
     drawtext("*", 50, cursor_locations[cursor_index])
 
