@@ -527,6 +527,9 @@ def highscore_menu():
                 if event.key == pygame.K_RETURN:
                     if playsound: MENU_SELECT_WAV.play()
                     highscore_menu_loop = False
+                if event.key == pygame.K_ESCAPE:
+                    if playsound: MENU_SELECT_WAV.play()
+                    highscore_menu_loop = False
 
         draw_highscore_menu()
 
@@ -624,7 +627,9 @@ def options_menu():
                     elif cursor_index == 4:
                         options_menu_loop = False
                     if playsound: MENU_SELECT_WAV.play()
-
+                if event.key == pygame.K_ESCAPE:
+                    if playsound: MENU_SELECT_WAV.play()
+                    options_menu_loop = False
         draw_options_menu(cursor_index, cursor_locations)
 
 def draw_options_menu(cursor_index, cursor_locations):
@@ -718,6 +723,9 @@ def select_player():
                     else:
                         main_menu()
                     select_player_loop = False
+                if event.key == pygame.K_ESCAPE:
+                    if playsound: MENU_SELECT_WAV.play()
+                    main_menu()
 
         draw_select_player(cursor_index,cursor_locations)
 
@@ -749,6 +757,9 @@ def newPlayer():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if playsound: MENU_SELECT_WAV.play()
+                    select_player()
                 if event.key == pygame.K_BACKSPACE:
                     if len(name) > 0:
                         if playsound: MENU_HOVER_WAV.play()
@@ -773,6 +784,9 @@ def newPlayer():
                 if event.key == pygame.K_RETURN:
                     wait_for_input = False
                     if playsound: MENU_SELECT_WAV.play()
+                if event.key == pygame.K_ESCAPE:
+                    if playsound: MENU_SELECT_WAV.play()
+                    select_player()
 
         draw_newPlayer(name, True)
 
@@ -795,6 +809,7 @@ def draw_newPlayer(name,show_star):
 
 def oldPlayer():
     global user
+    global user
 
     cursor_index = 0
     oldPlayer_loop = True
@@ -815,6 +830,9 @@ def oldPlayer():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if playsound: MENU_SELECT_WAV.play()
+                    select_player()
                 if event.key == pygame.K_w:
                     if cursor_index > 0:
                         if playsound: MENU_HOVER_WAV.play()
